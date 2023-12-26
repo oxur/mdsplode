@@ -1,0 +1,45 @@
+name: CI/CD
+
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+  schedule:
+  - cron: "40 2 * * *"
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Get Updates
+      run: make deps
+    - name: Build
+      run: make build
+    - name: Lint
+      run: make cicd-lint
+    - name: Run checks
+      run: |
+        make nightly
+        make install-cargo-deny
+        make install-udeps
+        make check
+    - name: Run tests
+      run: make test
+    - name: Build docs
+      run: make docs
+    - name: Install rucksack (crates.io)
+      run: cargo install rucksack
+    - name: Notify CI/CD Slack Channel
+      uses: innocarpe/actions-slack@v1
+      with:
+        status: ${{ job.status }}
+        success_text: '✅ Build for ${{ github.repository }} succeeded! 😄🌈🐴🚢🐿 (commit id: ${{ github.sha }})'
+        failure_text: '❌ Build for ${{ github.repository }} failed! 🤬💣🔥🚒 (commit id: ${{ github.sha }})'
+        cancelled_text: '🚧 Build for ${{ github.repository }} was cancelled ... 😯🦡 (commit id: ${{ github.sha }})'
+      env:
+        GITHUB_TOKEN: ${{ secrets.CICD_BOT_TOKEN }}
+        SLACK_WEBHOOK_URL: ${{ secrets.CICD_BOT_WEBHOOK }}
+      if: always()
