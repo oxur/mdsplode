@@ -22,9 +22,8 @@ jobs:
       run: make cicd-lint
     - name: Run checks
       run: |
-        make nightly
         make install-udeps
-        make check
+        make cicd-check
     - name: Run tests
       run: make test
     - name: Build docs
