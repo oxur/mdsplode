@@ -7,78 +7,29 @@ use serde::{Deserialize, Serialize};
 fn get_constructs() -> Constructs {
     Constructs {
         frontmatter: true,
+        math_flow: true,
+        math_text: true,
+        html_flow: true,
+        html_text: true,
         ..Constructs::gfm()
+    }
+}
+
+fn get_parse_options() -> ParseOptions {
+    ParseOptions {
+        constructs: get_constructs(),
+        ..ParseOptions::gfm()
     }
 }
 
 fn get_options() -> Options {
     Options {
-        parse: ParseOptions {
-            constructs: get_constructs(),
-            ..ParseOptions::gfm()
-        },
+        parse: get_parse_options(),
         compile: CompileOptions {
             allow_dangerous_html: true,
             ..CompileOptions::gfm()
         },
     }
-}
-
-#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
-struct CompoundChildren {
-    nodes: Vec<CompoundNode>,
-    rendered: String,
-}
-
-#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
-struct CompoundNode {
-    // node: mdast::Node,
-    name: String,
-    depth: i8,
-    markdown: String,
-    children: CompoundChildren,
-    rendered: String,
-}
-
-impl CompoundNode {
-    fn traverse(&mut self) {
-        for ch in self.children.nodes.iter_mut() {
-            ch.traverse();
-        }
-    }
-}
-
-fn to_compound(node: &mdast::Node) -> CompoundNode {
-    let children = to_children(node);
-    let md = node.to_string();
-    let html = markdown::to_html_with_options(md.as_str(), &get_options()).unwrap();
-    CompoundNode {
-        // node: node.clone(),
-        name: node_type(node.clone()),
-        depth: node_depth(node.clone()),
-        markdown: md,
-        rendered: html,
-        children: CompoundChildren {
-            nodes: children.clone(),
-            rendered: markdown::to_html_with_options(to_string(children).as_str(), &get_options())
-                .unwrap(),
-        },
-    }
-}
-
-fn to_children(node: &mdast::Node) -> Vec<CompoundNode> {
-    match node.children() {
-        None => vec![],
-        Some(ch) => ch.iter().map(to_compound).collect::<Vec<CompoundNode>>(),
-    }
-}
-
-fn to_string(nodes: Vec<CompoundNode>) -> String {
-    nodes
-        .iter()
-        .map(|x| x.rendered.clone())
-        .collect::<Vec<String>>()
-        .join("\n\n")
 }
 
 fn node_type(n: Node) -> String {
@@ -127,10 +78,78 @@ fn node_depth(n: Node) -> i8 {
     }
 }
 
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+struct CompoundChildren {
+    nodes: Vec<CompoundNode>,
+    rendered: String,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+struct CompoundNode {
+    // node: mdast::Node,
+    name: String,
+    depth: i8,
+    markdown: String,
+    children: CompoundChildren,
+    rendered: String,
+}
+
+impl CompoundNode {
+    fn traverse(&mut self) {
+        for ch in self.children.nodes.iter_mut() {
+            ch.traverse();
+        }
+    }
+}
+
+fn to_compound(node: &mdast::Node) -> CompoundNode {
+    let children = to_children(node);
+    let md = node.to_string();
+    let html = node_to_html(node.clone());
+    CompoundNode {
+        // node: node.clone(),
+        name: node_type(node.clone()),
+        depth: node_depth(node.clone()),
+        markdown: md,
+        rendered: html,
+        children: CompoundChildren {
+            nodes: children.clone(),
+            rendered: nodes_to_html(children),
+        },
+    }
+}
+
+fn to_children(node: &mdast::Node) -> Vec<CompoundNode> {
+    match node.children() {
+        None => vec![],
+        Some(ch) => ch.iter().map(to_compound).collect::<Vec<CompoundNode>>(),
+    }
+}
+
+fn nodes_to_string(nodes: Vec<CompoundNode>) -> String {
+    nodes
+        .iter()
+        .map(|x| x.rendered.clone())
+        .collect::<Vec<String>>()
+        .join("\n\n")
+}
+
+fn nodes_to_html(nodes: Vec<CompoundNode>) -> String {
+    markdown::to_html_with_options(nodes_to_string(nodes).as_str(), &get_options()).unwrap()
+}
+
+fn node_to_html(node: Node) -> String {
+    markdown::to_html_with_options(node.to_string().as_str(), &get_options()).unwrap()
+}
+
+fn file_to_md(file: &str) -> Node {
+    let md = fs::read_to_string(file).unwrap();
+    markdown::to_mdast(&md, &get_parse_options()).unwrap()
+}
+
 fn main() {
     let file = "./workbench/learn.md";
-    let md = fs::read_to_string(file).unwrap();
-    let mut tree = to_compound(&markdown::to_mdast(&md, &ParseOptions::gfm()).unwrap());
+    let mut tree = to_compound(&file_to_md(file));
     tree.traverse();
     let json = serde_json::to_string_pretty(&tree);
     println!("{:}", json.unwrap());
