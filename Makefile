@@ -90,3 +90,7 @@ setup-cargo-deny: install-cargo-deny
 install-udeps:
 	@echo ">> Setting up cargo udeps ..."
 	@cargo install cargo-udeps --locked
+
+cicd-install-udeps:
+	@echo ">> Setting up cargo udeps ..."
+	@cargo install cargo-udeps
