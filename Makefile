@@ -33,6 +33,9 @@ check:
 	@cargo deny check
 	@cargo +nightly udeps
 
+cicd-check:
+	@cargo udeps
+
 test:
 	@RUST_BACKTRACE=1 cargo test
 
