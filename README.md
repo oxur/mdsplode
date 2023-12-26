@@ -11,7 +11,7 @@
 
 ## About
 
-TBD
+This tool came about as a result of a pressing need in some LFE projects that needed finer-grained processing of Markdown files for publishing projects.
 
 ## Usage
 
