@@ -24,8 +24,8 @@ jobs:
       run: make test
     - name: Build docs
       run: make docs
-    - name: Install rucksack (crates.io)
-      run: cargo install rucksack
+    - name: Install mdsplode (crates.io)
+      run: cargo install mdsplode
     - name: Notify CI/CD Slack Channel
       uses: innocarpe/actions-slack@v1
       with:
