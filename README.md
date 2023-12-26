@@ -25,8 +25,8 @@ Apache License, Version 2.0
 
 [//]: ---Named-Links---
 
-[logo]: https://raw.githubusercontent.com/oxur/mdsplode/main/mdsplode/resources/images/logo-v1-x250.png
-[logo-large]: https://raw.githubusercontent.com/oxur/mdsplode/main/mdsplode/resources/images/logo-v1-x1000.png
+[logo]: https://raw.githubusercontent.com/oxur/mdsplode/main/mdsplode/resources/images/logo-small.jpg
+[logo-large]: https://raw.githubusercontent.com/oxur/mdsplode/main/mdsplode/resources/images/logo.jpg
 [build]: https://github.com/oxur/mdsplode/actions/workflows/cicd.yml
 [build-badge]: https://github.com/oxur/mdsplode/actions/workflows/cicd.yml/badge.svg
 [crate]: https://crates.io/crates/mdsplode
