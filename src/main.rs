@@ -3,6 +3,7 @@ use std::fs;
 use markdown::mdast::Node;
 use markdown::{mdast, CompileOptions, Constructs, Options, ParseOptions};
 use serde::{Deserialize, Serialize};
+use toml;
 
 fn get_constructs() -> Constructs {
     Constructs {
@@ -86,12 +87,13 @@ struct CompoundChildren {
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 struct CompoundNode {
-    // node: mdast::Node,
     name: String,
     depth: i8,
     markdown: String,
     children: CompoundChildren,
     rendered: String,
+    #[serde(skip_serializing)]
+    node: mdast::Node,
 }
 
 impl CompoundNode {
@@ -105,16 +107,16 @@ impl CompoundNode {
 fn to_compound(node: &mdast::Node) -> CompoundNode {
     let children = to_children(node);
     let md = node.to_string();
-    let html = node_to_html(node.clone());
+    let html = render_node(node.clone());
     CompoundNode {
-        // node: node.clone(),
+        node: node.clone(),
         name: node_type(node.clone()),
         depth: node_depth(node.clone()),
         markdown: md,
         rendered: html,
         children: CompoundChildren {
             nodes: children.clone(),
-            rendered: nodes_to_html(children),
+            rendered: render_nodes(children),
         },
     }
 }
@@ -126,20 +128,28 @@ fn to_children(node: &mdast::Node) -> Vec<CompoundNode> {
     }
 }
 
-fn nodes_to_string(nodes: Vec<CompoundNode>) -> String {
+fn render_nodes(nodes: Vec<CompoundNode>) -> String {
     nodes
         .iter()
-        .map(|x| x.rendered.clone())
+        .map(|x| render_node(x.node.clone()))
         .collect::<Vec<String>>()
         .join("\n\n")
 }
 
-fn nodes_to_html(nodes: Vec<CompoundNode>) -> String {
-    markdown::to_html_with_options(nodes_to_string(nodes).as_str(), &get_options()).unwrap()
+fn render_node(n: Node) -> String {
+    match n {
+        Node::Toml(_) => node_to_toml(n),
+        _ => node_to_html(n),
+    }
 }
 
 fn node_to_html(node: Node) -> String {
     markdown::to_html_with_options(node.to_string().as_str(), &get_options()).unwrap()
+}
+
+fn node_to_toml(node: Node) -> String {
+    let table = node.to_string().as_str().parse::<toml::Table>().unwrap();
+    serde_json::to_string_pretty(&table).unwrap()
 }
 
 fn file_to_md(file: &str) -> Node {

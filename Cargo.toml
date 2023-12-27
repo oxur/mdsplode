@@ -15,6 +15,7 @@ edition = "2021"
 markdown = { version = "1.0.0-alpha.16", features = ["serde"] }
 serde = "1.0.193"
 serde_json = "1.0.108"
+toml = "0.8.8"
 
 [[bin]]
 name = "mdsplode"
