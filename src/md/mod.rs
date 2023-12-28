@@ -1,4 +1,4 @@
-pub mod convert;
+pub mod converter;
 pub mod opts;
 
 use markdown::mdast::Node;
