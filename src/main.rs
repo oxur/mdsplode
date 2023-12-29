@@ -1,4 +1,9 @@
+use std::io::{self, Write};
+
+use anyhow::{anyhow, Error, Result};
 use clap::Parser;
+use jsonpath::Selector;
+use serde_json::Value;
 
 const STDOUT: &str = "stdout";
 
@@ -18,17 +23,38 @@ struct Cli {
     selector: Option<String>,
 }
 
-fn main() {
+fn main() -> Result<(), Error> {
     let cli = Cli::parse();
     let tree = mdsplode::parse_file(cli.input.as_str());
-    let json = tree.to_json();
-    // if match cli.selector {
-    //     Some(sel) => {
-
-    //     }
-    // }
+    let mut json = tree.to_json();
+    match cli.selector {
+        Some(sel) => {
+            // println!("Got selector: {:?}", sel);
+            let data: Value = serde_json::from_str(&json)?;
+            match Selector::new(&sel) {
+                Ok(s) => {
+                    json = s
+                        .find(&data)
+                        .map(|t| match t.as_str() {
+                            Some(str) => str,
+                            _ => "",
+                        })
+                        .collect();
+                    // println!("JSON: {:}", json);
+                }
+                Err(e) => {
+                    return Err(anyhow!(
+                        "{:}. Couldn't create selector from passed value.",
+                        e
+                    ));
+                }
+            }
+        }
+        _ => (),
+    };
     match cli.output.as_str() {
         STDOUT => println!("{:}", json),
         _ => unimplemented!(),
-    }
+    };
+    Ok(())
 }
