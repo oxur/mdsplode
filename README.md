@@ -56,7 +56,8 @@ With these set to the appropriate values for your system, running `make build` s
 ```shell
 ./bin/mdsplode \
     --input ./tests/data/learn.md \
-    --query '.children.nodes'
+    --query '.children.nodes' \
+    --pretty
 ```
 
 ## License
