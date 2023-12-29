@@ -1,9 +1,9 @@
-use std::io::{self, Write};
+use std::io;
+use std::io::prelude::*;
 
-use anyhow::{anyhow, Error, Result};
+use anyhow::{Error, Result};
 use clap::Parser;
-use jsonpath::Selector;
-use serde_json::Value;
+use jq_rs;
 
 const STDOUT: &str = "stdout";
 
@@ -19,42 +19,43 @@ struct Cli {
         help = "Output file or directory"
     )]
     output: String,
-    #[arg(short, long, help = "Optionally filter on a JSONpath selector")]
-    selector: Option<String>,
+    #[arg(short, long, help = "Optionally filter with a jq query string")]
+    query: Option<String>,
 }
 
 fn main() -> Result<(), Error> {
+    reset_sigpipe();
     let cli = Cli::parse();
     let tree = mdsplode::parse_file(cli.input.as_str());
     let mut json = tree.to_json();
-    match cli.selector {
-        Some(sel) => {
-            // println!("Got selector: {:?}", sel);
-            let data: Value = serde_json::from_str(&json)?;
-            match Selector::new(&sel) {
-                Ok(s) => {
-                    json = s
-                        .find(&data)
-                        .map(|t| match t.as_str() {
-                            Some(str) => str,
-                            _ => "",
-                        })
-                        .collect();
-                    // println!("JSON: {:}", json);
+    match cli.query {
+        Some(query) => {
+            match jq_rs::run(query.as_str(), &json) {
+                Ok(result) => {
+                    json = result;
                 }
-                Err(e) => {
-                    return Err(anyhow!(
-                        "{:}. Couldn't create selector from passed value.",
-                        e
-                    ));
-                }
-            }
+                _ => (),
+            };
         }
         _ => (),
     };
+    let stdout = io::stdout();
+    let mut stdout = stdout.lock();
     match cli.output.as_str() {
-        STDOUT => println!("{:}", json),
+        STDOUT => writeln!(stdout, "{:}", json)?,
         _ => unimplemented!(),
     };
     Ok(())
+}
+
+#[cfg(unix)]
+fn reset_sigpipe() {
+    unsafe {
+        libc::signal(libc::SIGPIPE, libc::SIG_DFL);
+    }
+}
+
+#[cfg(not(unix))]
+fn reset_sigpipe() {
+    // no-op
 }
