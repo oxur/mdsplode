@@ -9,7 +9,6 @@ make build
 
 echo
 header "Show top-level help"
-echo
 ./$BIN --help
 echo
 
