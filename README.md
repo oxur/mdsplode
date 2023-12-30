@@ -56,7 +56,7 @@ Query to pull out the front matter:
     --query '.children.nodes[] | select(.name == "toml") | .json'
 ```
 
-This this field is serialised JSON, we can pipe it to `jq` as a raw string and then again to parse it as JSON and pretty-print it:
+Since that field is serialised JSON, we can pipe it to `jq` as a raw string and then again to parse it as JSON and pretty-print it:
 
 ```shell
 echo `!!` | jq -r . | jq .frontmatter
