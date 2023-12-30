@@ -19,6 +19,16 @@ The project is written in Rust and depends upon that toolchain as well as the us
 
 ## Usage
 
+View all of the exploded parsed data (including the front matter):
+
+```shell
+./bin/mdsplode \
+    --input ./tests/data/learn.md \
+    --pretty
+```
+
+See a filtered subset of the exploded data:
+
 ```shell
 ./bin/mdsplode \
     --input ./tests/data/learn.md \
