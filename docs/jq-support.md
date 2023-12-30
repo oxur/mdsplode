@@ -54,7 +54,18 @@ You can get the location of the installed library files with the commands:
 ldd $(which jq)
 ```
 
-Then set the vars (these are from an ARM machine):
+```text
+linux-vdso.so.1 (0x0000007f7fb97000)
+libjq.so.1 => /lib/aarch64-linux-gnu/libjq.so.1 (0x0000007f7fae2000)
+libc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000007f7f96d000)
+/lib/ld-linux-aarch64.so.1 (0x0000007f7fb67000)
+libm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000007f7f8c2000)
+libonig.so.5 => /lib/aarch64-linux-gnu/libonig.so.5 (0x0000007f7f823000)
+```
+
+As you can see, this example is from an ARM-based machine.
+
+Then set the vars:
 
 ```shell
 export JQ_LIB_DIR=/lib/aarch64-linux-gnu
