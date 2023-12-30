@@ -21,6 +21,11 @@ build: $(BIN_DIR)
 	@rm -f $(BIN_DIR)/*
 	@cargo install --path ./ --root ./
 
+dev-build: $(BIN_DIR)
+	@cargo build --release --features logging
+	@rm -f $(BIN_DIR)/*
+	@cargo install --path ./ --root ./
+
 lint:
 	@cargo +nightly clippy --version
 	@cargo +nightly clippy --all-targets --all-features -- --no-deps -D clippy::all
