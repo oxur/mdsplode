@@ -20,7 +20,11 @@ markdown = { version = "1.0.0-alpha.16", features = ["serde"] }
 serde = "1.0.193"
 serde_json = { version = "1.0.108", features = ["raw_value"] }
 toml = "0.8.8"
+twyg = { version = "0.2", optional = true }
 versions = "6.0.0"
 
 [[bin]]
 name = "mdsplode"
+
+[features]
+logging = ["twyg"]
