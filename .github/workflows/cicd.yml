@@ -11,11 +11,18 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    env:
+        JQ_LIB_DIR: /lib/x86_64-linux-gnu
+        ONIG_LIB_DIR: /lib/x86_64-linux-gnu
+        LD_LIBRARY_PATH: /lib/x86_64-linux-gnu
     steps:
     - uses: actions/checkout@v4
     - name: Get Updates
-      run: make deps
+      run: |
+        make deps
+        sudo apt-get install libjq-dev libonig-dev
+        sudo ldd `which jq`
+        sudo apt-cache search jq
     - name: Build
       run: make build
     - name: Lint
