@@ -43,25 +43,7 @@ fn main() -> Result<(), Error> {
         _ => (),
     };
     match cli.pretty {
-        true => match serde_json::from_str::<Value>(json.as_str()) {
-            Ok(obj) => match serde_json::to_string_pretty(&obj) {
-                Ok(result) => {
-                    json = result;
-                }
-                Err(e) => {
-                    return Err(anyhow!(
-                        "Could not convert json fragment to pretty-printed string: {}",
-                        e
-                    ));
-                }
-            },
-            Err(e) => {
-                return Err(anyhow!(
-                    "Could not convert json string back to object for pretty-printing: {}",
-                    e
-                ));
-            }
-        },
+        true => json = pretty_print(json)?,
         _ => (),
     }
     let stdout = io::stdout();
@@ -71,6 +53,28 @@ fn main() -> Result<(), Error> {
         _ => unimplemented!(),
     };
     Ok(())
+}
+
+fn pretty_print(json: String) -> Result<String, Error> {
+    match serde_json::from_str::<Value>(json.as_str()) {
+        Ok(obj) => match serde_json::to_string_pretty(&obj) {
+            Ok(result) => {
+                return Ok(result);
+            }
+            Err(e) => {
+                return Err(anyhow!(
+                    "Could not convert json fragment to pretty-printed string: {}",
+                    e
+                ));
+            }
+        },
+        Err(e) => {
+            return Err(anyhow!(
+                "Could not convert json string back to object for pretty-printing: {}",
+                e
+            ));
+        }
+    };
 }
 
 #[cfg(unix)]
