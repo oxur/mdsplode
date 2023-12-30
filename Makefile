@@ -48,7 +48,7 @@ publish:
 	@cargo publish
 
 tag:
-	@git tag $$($(BIN_DIR)/$(PROJ) -v)
+	@git tag $$($(BIN_DIR)/$(PROJ) --version | cut -d " " -f 2)
 	@git push --tags
 
 release: build lint test tag publish
