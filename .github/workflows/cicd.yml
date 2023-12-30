@@ -31,8 +31,12 @@ jobs:
       run: make test
     - name: Build docs
       run: make docs
+    - name: Run mdsplode (locally)
+      run: ./tests/mdsplode_dev.sh
     - name: Install mdsplode (crates.io)
       run: cargo install mdsplode
+    - name: Run mdsplode
+      run: ./tests/mdsplode.sh
     - name: Notify CI/CD Slack Channel
       uses: innocarpe/actions-slack@v1
       with:
