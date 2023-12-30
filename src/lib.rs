@@ -1,3 +1,4 @@
+pub mod cli;
 pub mod md;
 pub mod sploder;
 
