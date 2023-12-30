@@ -3,7 +3,6 @@ use std::io::prelude::*;
 
 use anyhow::{anyhow, Error, Result};
 use clap::Parser;
-use jq_rs;
 use serde_json::Value;
 
 const STDOUT: &str = "stdout";
@@ -31,20 +30,13 @@ fn main() -> Result<(), Error> {
     let cli = Cli::parse();
     let tree = mdsplode::parse_file(cli.input.as_str());
     let mut json = tree.to_json();
-    match cli.query {
-        Some(query) => {
-            match jq_rs::run(query.as_str(), &json) {
-                Ok(result) => {
-                    json = result;
-                }
-                _ => (),
-            };
-        }
-        _ => (),
+    if let Some(query) = cli.query {
+        if let Ok(result) = jq_rs::run(query.as_str(), &json) {
+            json = result;
+        };
     };
-    match cli.pretty {
-        true => json = pretty_print(json)?,
-        _ => (),
+    if cli.pretty {
+        json = pretty_print(json)?
     }
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
@@ -58,23 +50,17 @@ fn main() -> Result<(), Error> {
 fn pretty_print(json: String) -> Result<String, Error> {
     match serde_json::from_str::<Value>(json.as_str()) {
         Ok(obj) => match serde_json::to_string_pretty(&obj) {
-            Ok(result) => {
-                return Ok(result);
-            }
-            Err(e) => {
-                return Err(anyhow!(
-                    "Could not convert json fragment to pretty-printed string: {}",
-                    e
-                ));
-            }
-        },
-        Err(e) => {
-            return Err(anyhow!(
-                "Could not convert json string back to object for pretty-printing: {}",
+            Ok(result) => Ok(result),
+            Err(e) => Err(anyhow!(
+                "Could not convert json fragment to pretty-printed string: {}",
                 e
-            ));
-        }
-    };
+            )),
+        },
+        Err(e) => Err(anyhow!(
+            "Could not convert json string back to object for pretty-printing: {}",
+            e
+        )),
+    }
 }
 
 #[cfg(unix)]
