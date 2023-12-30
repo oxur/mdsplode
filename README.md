@@ -19,7 +19,7 @@ The project is written in Rust and depends upon that toolchain as well as the us
 
 ## Usage
 
-View all of the exploded parsed data (including the front matter):
+View all of the exploded parsed data:
 
 ```shell
 ./bin/mdsplode \
@@ -27,13 +27,50 @@ View all of the exploded parsed data (including the front matter):
     --pretty
 ```
 
-See a filtered subset of the exploded data:
+See a filtered subset, for example, the exploded metadata for a particular Markdown heading:
 
 ```shell
 ./bin/mdsplode \
     --input ./tests/data/learn.md \
-    --query '.children.nodes' \
-    --pretty
+    --pretty \
+    --query '.children.nodes[] | select(((.depth == 3) and .name == "heading") and .source == "Getting Started")'
+```
+
+**Important!**: When using `--pretty`, only `jq` queries which result in valid JSON should be used; anything else will result in JSON parsing errors (since the use of `--pretty` requires a re-parsing to JSON for the post-query results).
+
+Get the HTML for all headings of depth 3:
+
+```shell
+./bin/mdsplode \
+    --input ./tests/data/learn.md \
+    --query '.children.nodes[] | select((.depth == 3) and .name == "heading") | .children.nodes[].html'
+```
+
+That command doesn't produce valid JSON, so the `--pretty` wasn't used (to avoid errors and because it simply wasn't applicable).
+
+Query to pull out the front matter:
+
+```shell:
+./bin/mdsplode \
+    --input ./tests/data/learn.md \
+    --query '.children.nodes[] | select(.name == "toml") | .json'
+```
+
+This this field is serialised JSON, we can pipe it to `jq` as a raw string and then again to parse it as JSON and pretty-print it:
+
+```shell
+echo `!!` | jq -r . | jq .frontmatter
+```
+
+```json
+{
+  "in_search_index": true,
+  "title": "Learn",
+  "extra": {
+    "long_description": "Learning LFE must be taken in three tracks: learning the syntax particular to a Lisp on the Erlang VM, with all its support for pattern matching, Erlang-style arities, etc.; learning the ins-and-outs of BEAM languages and OTP; and finally, more deeply exploring the Lisp heritage of LFE. This multi-pronged approach is the path to success.",
+    "long_title": "Resources for Learning LFE"
+  }
+}
 ```
 
 ## License
