@@ -21,8 +21,6 @@ jobs:
       run: |
         make deps
         sudo apt-get install libjq-dev libonig-dev
-        sudo ldd `which jq`
-        sudo apt-cache search jq
     - name: Build
       run: make build
     - name: Lint
