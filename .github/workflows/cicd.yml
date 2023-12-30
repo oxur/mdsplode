@@ -11,6 +11,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    # Once the CI/CD builds got working, didn't bother testing without these ...
+    # not sure if they're actually needed:
     env:
         JQ_LIB_DIR: /lib/x86_64-linux-gnu
         ONIG_LIB_DIR: /lib/x86_64-linux-gnu
