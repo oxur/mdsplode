@@ -31,3 +31,27 @@ header "View the parsed front matter for the Markdowwn file"
 --query '.children.nodes[] | select(.name == "toml") | .json' | \
 jq -r . | jq .frontmatter
 echo
+
+header "Process markdown to file ($TMP_DIR/out.json)"
+mkdir -p $TMP_DIR
+./$BIN --input "$MD_FILE" --output "$TMP_DIR/out.json"
+echo
+
+header "Read from $TMP_DIR/out.json"
+cat "$TMP_DIR/out.json"
+echo
+echo
+
+header "Process again to same markdown file ($TMP_DIR/out.json)"
+./$BIN --input "$MD_FILE" --output "$TMP_DIR/out.json"
+echo
+
+header "Re-read from $TMP_DIR/out.json"
+cat "$TMP_DIR/out.json"
+echo
+echo
+
+header "Skip processing, read from $TMP_DIR/out.json, and apply query"
+./$BIN --skip-process --input "$TMP_DIR/out.json" \
+--query '.children.nodes[] | select((.depth == 3) and .name == "heading") | .children.nodes[].source'
+echo

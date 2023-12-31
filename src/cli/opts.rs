@@ -21,6 +21,13 @@ pub struct Opts {
     pub pretty: bool,
     #[arg(short, long, help = "Optionally filter output with a jq query string")]
     pub query: Option<String>,
+    #[arg(
+        long,
+        short,
+        action,
+        help = "If provided, skip the Markdown processing; assume input files are pre-processed mdsplode output JSON data files"
+    )]
+    pub skip_process: bool,
 }
 
 impl Opts {
