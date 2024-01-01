@@ -1,27 +1,19 @@
+pub mod handler;
+
 use anyhow::Result;
 use clap::{value_parser, Arg, Command};
 
-use super::writer;
+use super::state::State;
 
-pub fn dispatch(line: &str) -> Result<bool, String> {
+pub fn dispatch(state: State, line: &str) -> Result<State, String> {
     let args = shlex::split(line).ok_or("error: Invalid quoting")?;
     let matches = cmd()
         .try_get_matches_from(args)
         .map_err(|e| e.to_string())?;
     match matches.subcommand() {
-        Some(("echo", matches)) => {
-            let msg = matches
-                .get_many::<String>("args")
-                .map(|vals| vals.collect::<Vec<_>>())
-                .unwrap_or_default()
-                .iter()
-                .map(|x| x.as_str())
-                .collect::<Vec<&str>>()
-                .join(" ");
-            writer::msg(&msg, false)
-        }
-        Some(("ping", _matches)) => writer::msg("Pong", false),
-        Some(("quit", _matches)) => writer::msg("Quitting ...", true),
+        Some(("echo", matches)) => handler::echo(state.clone(), matches),
+        Some(("ping", matches)) => handler::ping(state.clone(), matches),
+        Some(("quit", matches)) => handler::quit(state.clone(), matches),
         Some((name, _matches)) => unimplemented!("{name}"),
         None => unreachable!("subcommand required"),
     }
@@ -29,7 +21,7 @@ pub fn dispatch(line: &str) -> Result<bool, String> {
 
 fn cmd() -> Command {
     // strip out usage
-    const PARSER_TEMPLATE: &str = "\
+    const PARSER_TEMPLATE: &str = "\n\
         {all-args}
     ";
     // strip out name/version
@@ -44,8 +36,8 @@ fn cmd() -> Command {
         .multicall(true)
         .arg_required_else_help(true)
         .subcommand_required(true)
-        .subcommand_value_name("APPLET")
-        .subcommand_help_heading("APPLETS")
+        .subcommand_value_name("COMMAND")
+        .subcommand_help_heading("COMMMANDS")
         .help_template(PARSER_TEMPLATE)
         .subcommand(
             Command::new("echo")
