@@ -1,5 +1,6 @@
 use clap::parser::ArgMatches;
 
+use crate as mdsplode;
 use crate::shell::state::State;
 use crate::shell::writer;
 
@@ -39,6 +40,10 @@ pub fn quit(mut state: State, _matches: &ArgMatches) -> Result<State, String> {
 
 pub fn read(state: State, _matches: &ArgMatches) -> Result<State, String> {
     writer::msg(state, "TBD")
+}
+
+pub fn version(state: State, _matches: &ArgMatches) -> Result<State, String> {
+    writer::msg(state, mdsplode::version().to_string().as_str())
 }
 
 // Private functions
