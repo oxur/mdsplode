@@ -1,7 +1,7 @@
 use std::io::Write;
 
 use anyhow::{Error, Result};
-use clap::Command;
+use clap::{value_parser, Arg, Command};
 
 use crate::cli::opts::Opts;
 
@@ -26,8 +26,7 @@ fn shell(_opts: Opts) -> Result<(), String> {
                 }
             }
             Err(err) => {
-                write!(std::io::stdout(), "{err}").map_err(|e| e.to_string())?;
-                std::io::stdout().flush().map_err(|e| e.to_string())?;
+                write_msg(err.as_str(), false)?;
             }
         }
     }
@@ -37,40 +36,42 @@ fn shell(_opts: Opts) -> Result<(), String> {
 
 fn respond(line: &str) -> Result<bool, String> {
     let args = shlex::split(line).ok_or("error: Invalid quoting")?;
-    let matches = cli()
+    let matches = cmd()
         .try_get_matches_from(args)
         .map_err(|e| e.to_string())?;
     match matches.subcommand() {
-        Some(("ping", _matches)) => {
-            writeln!(std::io::stdout(), "Pong").map_err(|e| e.to_string())?;
-            std::io::stdout().flush().map_err(|e| e.to_string())?;
+        Some(("echo", matches)) => {
+            let msg = matches
+                .get_many::<String>("args")
+                .map(|vals| vals.collect::<Vec<_>>())
+                .unwrap_or_default()
+                .iter()
+                .map(|x| x.as_str())
+                .collect::<Vec<&str>>()
+                .join(" ");
+            write_msg(&msg, false)
         }
-        Some(("quit", _matches)) => {
-            writeln!(std::io::stdout(), "Exiting ...").map_err(|e| e.to_string())?;
-            std::io::stdout().flush().map_err(|e| e.to_string())?;
-            return Ok(true);
-        }
+        Some(("ping", _matches)) => write_msg("Pong", false),
+        Some(("quit", _matches)) => write_msg("Quitting ...", true),
         Some((name, _matches)) => unimplemented!("{name}"),
         None => unreachable!("subcommand required"),
     }
-
-    Ok(false)
 }
 
-fn cli() -> Command {
+fn cmd() -> Command {
     // strip out usage
     const PARSER_TEMPLATE: &str = "\
         {all-args}
     ";
     // strip out name/version
-    const APPLET_TEMPLATE: &str = "\
+    const USAGE_TEMPLATE: &str = "\
         {about-with-newline}\n\
         {usage-heading}\n    {usage}\n\
         \n\
-        {all-args}{after-help}\
+        {all-args}{after-help}\n\
     ";
 
-    Command::new("repl")
+    Command::new("shell")
         .multicall(true)
         .arg_required_else_help(true)
         .subcommand_required(true)
@@ -78,24 +79,44 @@ fn cli() -> Command {
         .subcommand_help_heading("APPLETS")
         .help_template(PARSER_TEMPLATE)
         .subcommand(
+            Command::new("echo")
+                .about("Respond with passed message")
+                .help_template(USAGE_TEMPLATE)
+                .arg(
+                    Arg::new("args")
+                        .num_args(0..)
+                        .value_parser(value_parser!(String)),
+                ),
+        )
+        .subcommand(
             Command::new("ping")
                 .about("Get a response")
-                .help_template(APPLET_TEMPLATE),
+                .help_template(USAGE_TEMPLATE),
         )
         .subcommand(
             Command::new("quit")
                 .alias("exit")
-                .about("Quit the REPL")
-                .help_template(APPLET_TEMPLATE),
+                .about("Quit the shell")
+                .help_template(USAGE_TEMPLATE),
         )
 }
 
 fn readline() -> Result<String, String> {
     write!(std::io::stdout(), "$ ").map_err(|e| e.to_string())?;
-    std::io::stdout().flush().map_err(|e| e.to_string())?;
+    flush()?;
     let mut buffer = String::new();
     std::io::stdin()
         .read_line(&mut buffer)
         .map_err(|e| e.to_string())?;
     Ok(buffer)
+}
+
+fn write_msg(msg: &str, quit: bool) -> Result<bool, String> {
+    writeln!(std::io::stdout(), "{}", msg).map_err(|e| e.to_string())?;
+    flush()?;
+    Ok(quit)
+}
+
+fn flush() -> Result<(), String> {
+    std::io::stdout().flush().map_err(|e| e.to_string())
 }
