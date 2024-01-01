@@ -6,6 +6,8 @@ pub struct State {
     pub prompt: String,
     pub quit: bool,
     pub result: String,
+    pub source: String,
+    pub parsed: String,
     pub show_banner: bool,
 }
 
