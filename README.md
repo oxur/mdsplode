@@ -17,7 +17,19 @@ This tool came about as a result of a pressing need in some LFE projects that ne
 
 The project is written in Rust and depends upon that toolchain as well as the usual gcc toolchain. In addition, the library files for `jq` and `oniguruma` are needed. For instructions on how to install these, see [Supporting jq Queries](./docs/jq-support.md).
 
-## Usage
+## Shell
+
+The primary use case for mdsplode is to be managed my another long-running process that writes to mdsplode's `stdin` and reads from its `stdout`.
+
+The shell is started with that as the command on the CLI:
+
+```shell
+mdsplode shell
+```
+
+[![][shell-screenshot-large]][shell-screenshot-large]
+
+## CLI Usage
 
 View all of the exploded parsed data:
 
@@ -93,3 +105,4 @@ Apache License, Version 2.0
 [docs-badge]: https://img.shields.io/badge/rust-documentation-blue.svg
 [tag-badge]: https://img.shields.io/github/tag/oxur/mdsplode.svg
 [tag]: https://github.com/oxur/mdsplode/tags
+[shell-screenshot-large]: https://raw.githubusercontent.com/oxur/mdsplode/release/0.3.x/resources/images/shell-screenshot.png
