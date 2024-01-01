@@ -15,7 +15,9 @@ pub fn dispatch(state: State, line: &str) -> Result<State, String> {
         Some(("echo", matches)) => handler::echo(state.clone(), matches),
         Some(("history", matches)) => handler::history(state.clone(), matches),
         Some(("ping", matches)) => handler::ping(state.clone(), matches),
+        Some(("query", matches)) => handler::query(state.clone(), matches),
         Some(("quit", matches)) => handler::quit(state.clone(), matches),
+        Some(("read", matches)) => handler::read(state.clone(), matches),
         Some((name, _matches)) => unimplemented!("{name}"),
         None => unreachable!("subcommand required"),
     }
@@ -68,9 +70,39 @@ fn cmd() -> Command {
                 .help_template(USAGE_TEMPLATE),
         )
         .subcommand(
+            Command::new("query")
+                .alias("q")
+                .alias("jq")
+                .about("Perform a jq-style query on the most recently read data (aliases: q, jq)")
+                .help_template(USAGE_TEMPLATE)
+                .arg(
+                    Arg::new("query-string")
+                        .num_args(0..)
+                        .value_parser(value_parser!(String)),
+                ),
+        )
+        .subcommand(
             Command::new("quit")
                 .alias("exit")
-                .about("Quit the shell")
+                .about("Quit the shell (alias: exit)")
                 .help_template(USAGE_TEMPLATE),
+        )
+        .subcommand(
+            Command::new("read")
+                .alias("r")
+                .about("Read in a data source (alias: r)")
+                .help_template(USAGE_TEMPLATE)
+                .subcommand(
+                    Command::new("md")
+                        .about("Set the data source to be read as Markdown")
+                        .help_template(USAGE_TEMPLATE)
+                        .arg(Arg::new("filename")),
+                )
+                .subcommand(
+                    Command::new("json")
+                        .about("Set the data source to be read as JSON")
+                        .help_template(USAGE_TEMPLATE)
+                        .arg(Arg::new("filename")),
+                ),
         )
 }

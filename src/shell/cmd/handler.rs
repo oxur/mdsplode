@@ -28,9 +28,17 @@ pub fn ping(state: State, _matches: &ArgMatches) -> Result<State, String> {
     writer::msg(state, "pong")
 }
 
+pub fn query(state: State, _matches: &ArgMatches) -> Result<State, String> {
+    writer::msg(state, "TBD")
+}
+
 pub fn quit(mut state: State, _matches: &ArgMatches) -> Result<State, String> {
     state.quit = true;
     writer::msg(state, "\nQuitting ...\n")
+}
+
+pub fn read(state: State, _matches: &ArgMatches) -> Result<State, String> {
+    writer::msg(state, "TBD")
 }
 
 // Private functions
