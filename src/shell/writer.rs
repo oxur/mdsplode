@@ -1,9 +1,11 @@
 use std::io::{self, Write};
 
-pub fn msg(msg: &str, quit: bool) -> Result<bool, String> {
+use super::state::State;
+
+pub fn msg(state: State, msg: &str) -> Result<State, String> {
     writeln!(io::stdout(), "{}", msg).map_err(|e| e.to_string())?;
     flush()?;
-    Ok(quit)
+    Ok(state)
 }
 
 pub fn flush() -> Result<(), String> {
