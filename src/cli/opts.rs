@@ -1,15 +1,16 @@
 use std::path::Path;
 
 use anyhow::{anyhow, Error, Result};
-use clap::Parser;
+use clap::{Parser, Subcommand};
 
 use super::STDOUT;
 
 #[derive(Parser, Clone, Debug)]
 #[command(author, version, about, long_about = None)]
+#[command(propagate_version = true)]
 pub struct Opts {
-    #[arg(short, long, required = true, help = "Input file or directory")]
-    pub input: String,
+    #[arg(short, long, help = "Input file or directory")]
+    pub input: Option<String>,
     #[arg(
         long,
         short,
@@ -36,15 +37,18 @@ pub struct Opts {
         help = "If provided, skip the Markdown processing; assume input files are pre-processed mdsplode output JSON data files"
     )]
     pub skip_process: bool,
+
+    #[command(subcommand)]
+    pub command: Option<Commands>,
 }
 
 impl Opts {
     pub fn is_dir(&self) -> bool {
-        Path::new(&self.input).is_dir()
+        Path::new(&self.input.clone().unwrap()).is_dir()
     }
 
     pub fn is_file(&self) -> bool {
-        Path::new(&self.input).is_file()
+        Path::new(&self.input.clone().unwrap()).is_file()
     }
 
     pub fn is_stdout(&self) -> bool {
@@ -53,7 +57,15 @@ impl Opts {
 
     pub fn setup_logging(&self) {}
 
+    // validate is only intended for use with the CLI; current design will break if
+    // one attempts to use it with the shell.
     pub fn validate(&self) -> Result<(), Error> {
+        match self.input {
+            None => Err(anyhow!(
+                "When using mdsplode's CLI, the 'input' parameter is required."
+            )),
+            _ => Ok(()),
+        }?;
         let out_path = Path::new(&self.output);
         if self.is_dir() {
             if !out_path.is_dir() && !self.skip_process {
@@ -64,4 +76,9 @@ impl Opts {
         }
         Ok(())
     }
+}
+
+#[derive(Subcommand, Clone, Debug)]
+pub enum Commands {
+    Shell,
 }
