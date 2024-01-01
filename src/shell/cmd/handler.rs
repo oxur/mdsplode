@@ -20,6 +20,10 @@ pub fn echo(state: State, matches: &ArgMatches) -> Result<State, String> {
     writer::msg(state, &msg)
 }
 
+pub fn history(state: State, _matches: &ArgMatches) -> Result<State, String> {
+    writer::msg(state.clone(), format_list(state.history).as_str())
+}
+
 pub fn ping(state: State, _matches: &ArgMatches) -> Result<State, String> {
     writer::msg(state, "pong")
 }
@@ -27,4 +31,13 @@ pub fn ping(state: State, _matches: &ArgMatches) -> Result<State, String> {
 pub fn quit(mut state: State, _matches: &ArgMatches) -> Result<State, String> {
     state.quit = true;
     writer::msg(state, "\nQuitting ...\n")
+}
+
+// Private functions
+
+fn format_list(mut list: Vec<String>) -> String {
+    const PREFIX: &str = "  ";
+    let mut res: Vec<String> = vec![PREFIX.to_string()];
+    res.append(&mut list);
+    format!("\n{}{}\n", PREFIX, res.join(PREFIX).trim())
 }
