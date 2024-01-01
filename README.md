@@ -73,6 +73,8 @@ echo `!!` | jq -r . | jq .frontmatter
 }
 ```
 
+Note that `mdsplode` also supports operating on directories (for processing multiple files in one go).
+
 ## License
 
 Copyright © 2023-2024, Oxur Group
