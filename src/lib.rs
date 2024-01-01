@@ -1,6 +1,7 @@
 pub mod cli;
 pub mod logging;
 pub mod md;
+pub mod shell;
 pub mod sploder;
 
 pub use sploder::parser::parse_file;
