@@ -3,6 +3,11 @@ use clap::parser::ArgMatches;
 use crate::shell::state::State;
 use crate::shell::writer;
 
+pub fn banner(mut state: State, _matches: &ArgMatches) -> Result<State, String> {
+    state.show_banner = true;
+    writer::msg(state, "")
+}
+
 pub fn echo(state: State, matches: &ArgMatches) -> Result<State, String> {
     let msg = matches
         .get_many::<String>("args")

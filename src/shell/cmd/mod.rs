@@ -11,6 +11,7 @@ pub fn dispatch(state: State, line: &str) -> Result<State, String> {
         .try_get_matches_from(args)
         .map_err(|e| e.to_string())?;
     match matches.subcommand() {
+        Some(("banner", matches)) => handler::banner(state.clone(), matches),
         Some(("echo", matches)) => handler::echo(state.clone(), matches),
         Some(("ping", matches)) => handler::ping(state.clone(), matches),
         Some(("quit", matches)) => handler::quit(state.clone(), matches),
@@ -40,8 +41,13 @@ fn cmd() -> Command {
         .subcommand_help_heading("COMMMANDS")
         .help_template(PARSER_TEMPLATE)
         .subcommand(
+            Command::new("banner")
+                .about("Show the mdsplode banner")
+                .help_template(USAGE_TEMPLATE),
+        )
+        .subcommand(
             Command::new("echo")
-                .about("Respond with passed message")
+                .about("Respond with the passed message")
                 .help_template(USAGE_TEMPLATE)
                 .arg(
                     Arg::new("args")
@@ -51,7 +57,7 @@ fn cmd() -> Command {
         )
         .subcommand(
             Command::new("ping")
-                .about("Get a response")
+                .about("Check for liveliness")
                 .help_template(USAGE_TEMPLATE),
         )
         .subcommand(
