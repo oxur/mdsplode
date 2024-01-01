@@ -16,16 +16,14 @@ anyhow = "1.0.77"
 clap = { version = "4.4.11", features = ["derive"] }
 jq-rs = "0.4.1"
 libc = "0.2.151"
+log = "0.4"
 markdown = { version = "1.0.0-alpha.16", features = ["serde"] }
 serde = "1.0.193"
 serde_json = { version = "1.0.108", features = ["raw_value"] }
 toml = "0.8.8"
-twyg = { version = "0.2", optional = true }
+twyg = { version = "0.2" }
 versions = "6.0.0"
 walkdir = "2.4"
 
 [[bin]]
 name = "mdsplode"
-
-[features]
-logging = ["twyg"]

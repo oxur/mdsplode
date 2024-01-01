@@ -9,6 +9,7 @@ use crate::parse_file;
 use super::util::{pretty_print, run_query};
 
 pub fn process(in_file: String, out_file: String, cli: Opts) -> Result<(), Error> {
+    log::info!("Processing file: {}", in_file);
     let mut json: String;
     // --skip-process
     if cli.skip_process {
@@ -47,7 +48,7 @@ pub fn process(in_file: String, out_file: String, cli: Opts) -> Result<(), Error
 
 fn read_to_string(filename: String) -> Result<String, Error> {
     match fs::read_to_string(filename.as_str()) {
-        Err(e) => return Err(anyhow!("{:}", e)),
+        Err(e) => Err(anyhow!("{:}", e)),
         Ok(data) => Ok(data),
     }
 }
