@@ -55,3 +55,16 @@ header "Skip processing, read from $TMP_DIR/out.json, and apply query"
 ./$BIN --skip-process --input "$TMP_DIR/out.json" \
 --query '.children.nodes[] | select((.depth == 3) and .name == "heading") | .children.nodes[].source'
 echo
+
+header "Process multiple markdown files ($MD_DIR/)"
+rm -rf $TMP_DIR/many-md-files
+mkdir -p $TMP_DIR/many-md-files
+./$BIN --input "$MD_DIR" --output "$TMP_DIR/many-md-files"
+find $TMP_DIR/many-md-files -type f -ls
+echo
+
+header "View title from each of the multiple files"
+./$BIN --skip-process --input "$TMP_DIR/many-md-files" --log-level info \
+--query '.children.nodes[] | select(.name == "toml") | .json' | \
+tr ',' '\n'|egrep -e '"title|INFO'
+echo

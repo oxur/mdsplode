@@ -11,6 +11,14 @@ pub struct Opts {
     #[arg(short, long, required = true, help = "Input file or directory")]
     pub input: String,
     #[arg(
+        long,
+        short,
+        default_value = "error",
+        help = "If logging is enabled, log at this level"
+    )]
+    pub log_level: String,
+
+    #[arg(
         short,
         long,
         default_value = STDOUT,
@@ -43,10 +51,12 @@ impl Opts {
         self.output.as_str() == STDOUT
     }
 
+    pub fn setup_logging(&self) {}
+
     pub fn validate(&self) -> Result<(), Error> {
         let out_path = Path::new(&self.output);
         if self.is_dir() {
-            if !out_path.is_dir() {
+            if !out_path.is_dir() && !self.skip_process {
                 return Err(anyhow!("When the supplied input is a directory, '--output' must be provided and must point to an existing directory."));
             } else {
                 return Ok(());
