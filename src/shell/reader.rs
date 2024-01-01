@@ -2,10 +2,11 @@ use std::io::{self, Write};
 
 use anyhow::Result;
 
+use super::state::State;
 use super::writer;
 
-pub fn line() -> Result<String, String> {
-    write!(io::stdout(), "$ ").map_err(|e| e.to_string())?;
+pub fn line(state: State) -> Result<String, String> {
+    write!(io::stdout(), "{}", state.prompt.as_str()).map_err(|e| e.to_string())?;
     writer::flush()?;
     let mut buffer = String::new();
     io::stdin()

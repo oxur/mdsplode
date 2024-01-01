@@ -3,6 +3,8 @@ use std::path::Path;
 use anyhow::{anyhow, Error, Result};
 use clap::{Parser, Subcommand};
 
+use crate::shell::DEFAULT_PROMPT;
+
 use super::STDOUT;
 
 #[derive(Parser, Clone, Debug)]
@@ -26,8 +28,10 @@ pub struct Opts {
         help = "Output file or directory"
     )]
     pub output: String,
-    #[arg(long, short, action, help = "If provided, pretty-print output JSON")]
+    #[arg(long, action, help = "If provided, pretty-print output JSON")]
     pub pretty: bool,
+    #[arg(long, default_value = DEFAULT_PROMPT, help = "Override the default shell prompt")]
+    pub prompt: Option<String>,
     #[arg(short, long, help = "Optionally filter output with a jq query string")]
     pub query: Option<String>,
     #[arg(
