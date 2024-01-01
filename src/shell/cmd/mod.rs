@@ -13,6 +13,7 @@ pub fn dispatch(state: State, line: &str) -> Result<State, String> {
     match matches.subcommand() {
         Some(("banner", matches)) => handler::banner(state.clone(), matches),
         Some(("echo", matches)) => handler::echo(state.clone(), matches),
+        Some(("history", matches)) => handler::history(state.clone(), matches),
         Some(("ping", matches)) => handler::ping(state.clone(), matches),
         Some(("quit", matches)) => handler::quit(state.clone(), matches),
         Some((name, _matches)) => unimplemented!("{name}"),
@@ -54,6 +55,12 @@ fn cmd() -> Command {
                         .num_args(0..)
                         .value_parser(value_parser!(String)),
                 ),
+        )
+        .subcommand(
+            Command::new("history")
+                .alias("hist")
+                .about("Show all commands entered so far")
+                .help_template(USAGE_TEMPLATE),
         )
         .subcommand(
             Command::new("ping")
