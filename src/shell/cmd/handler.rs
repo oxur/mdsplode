@@ -26,5 +26,5 @@ pub fn ping(state: State, _matches: &ArgMatches) -> Result<State, String> {
 
 pub fn quit(mut state: State, _matches: &ArgMatches) -> Result<State, String> {
     state.quit = true;
-    writer::msg(state, "Quitting ...")
+    writer::msg(state, "\nQuitting ...\n")
 }
