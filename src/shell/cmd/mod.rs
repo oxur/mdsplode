@@ -18,6 +18,7 @@ pub fn dispatch(state: State, line: &str) -> Result<State, String> {
         Some(("query", matches)) => handler::query(state.clone(), matches),
         Some(("quit", matches)) => handler::quit(state.clone(), matches),
         Some(("read", matches)) => handler::read(state.clone(), matches),
+        Some(("version", matches)) => handler::version(state.clone(), matches),
         Some((name, _matches)) => unimplemented!("{name}"),
         None => unreachable!("subcommand required"),
     }
@@ -104,5 +105,11 @@ fn cmd() -> Command {
                         .help_template(USAGE_TEMPLATE)
                         .arg(Arg::new("filename")),
                 ),
+        )
+        .subcommand(
+            Command::new("version")
+                .alias("ver")
+                .about("Display the current version")
+                .help_template(USAGE_TEMPLATE),
         )
 }
