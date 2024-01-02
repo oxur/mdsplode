@@ -4,6 +4,7 @@ use crate as mdsplode;
 use crate::md::converter;
 use crate::shell::state::State;
 use crate::shell::writer;
+use crate::sploder::util::{pretty_print, run_query};
 use crate::sploder::{file, parser};
 
 const PREFIX: &str = "  ";
@@ -14,14 +15,7 @@ pub fn banner(mut state: State, _matches: &ArgMatches) -> Result<State, String> 
 }
 
 pub fn echo(state: State, matches: &ArgMatches) -> Result<State, String> {
-    let msg = matches
-        .get_many::<String>("args")
-        .map(|vals| vals.collect::<Vec<_>>())
-        .unwrap_or_default()
-        .iter()
-        .map(|x| x.as_str())
-        .collect::<Vec<&str>>()
-        .join(" ");
+    let msg = concat_args(matches, "args");
     writer::msg(state, &msg)
 }
 
@@ -33,8 +27,21 @@ pub fn ping(state: State, _matches: &ArgMatches) -> Result<State, String> {
     writer::msg(state, format_str("pong").as_str())
 }
 
-pub fn query(state: State, _matches: &ArgMatches) -> Result<State, String> {
-    writer::msg(state, "TBD")
+pub fn query(state: State, matches: &ArgMatches) -> Result<State, String> {
+    if state.parsed.is_empty() {
+        return Err("Parsed is empty, cannot run query. Has a file been read?".to_string());
+    };
+    let query = concat_args(matches, "query-string");
+    match run_query(state.clone().parsed, query) {
+        Ok(r) => match matches.get_one::<bool>("pretty-print") {
+            Some(true) => match pretty_print(r) {
+                Ok(pp) => writer::msg(state.clone(), pp.as_str()),
+                Err(e) => Err(e.to_string()),
+            },
+            _ => writer::msg(state.clone(), r.as_str()),
+        },
+        Err(e) => Err(e.to_string()),
+    }
 }
 
 pub fn quit(mut state: State, _matches: &ArgMatches) -> Result<State, String> {
@@ -110,6 +117,17 @@ fn format_list(mut list: Vec<String>) -> String {
     let mut res: Vec<String> = vec![PREFIX.to_string()];
     res.append(&mut list);
     format!("\n{}{}\n", PREFIX, res.join(PREFIX).trim())
+}
+
+fn concat_args(matches: &ArgMatches, id: &str) -> String {
+    matches
+        .get_many::<String>(id)
+        .map(|vals| vals.collect::<Vec<_>>())
+        .unwrap_or_default()
+        .iter()
+        .map(|x| x.as_str())
+        .collect::<Vec<&str>>()
+        .join(" ")
 }
 
 fn match_filename(matches: &ArgMatches) -> String {

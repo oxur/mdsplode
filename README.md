@@ -52,6 +52,33 @@ sploder> read json "tests/data/parsed.json"
 
   Loaded "tests/data/parsed.json"
 
+sploder> query '.children.nodes[] | select(.depth == 3) | .source'
+"Sub Heading 1"
+"Sub Heading 2"
+
+sploder> query --pretty '.children.nodes[] | select(.source == "Sub Heading 1")'
+{
+  "children": {
+    "html": "<p>Sub Heading 1</p>",
+    "json": "",
+    "nodes": [
+      {
+        "children": {
+          "html": "",
+          "json": "",
+          "nodes": []
+        },
+        "depth": -1,
+        "html": "<p>Sub Heading 1</p>",
+        "name": "text",
+        "source": "Sub Heading 1"
+      }
+    ]
+  },
+  "depth": 3,
+  "name": "heading",
+  "source": "Sub Heading 1"
+}
 sploder> quit
 
   Quitting ...
