@@ -1,10 +1,11 @@
+use anyhow::{anyhow, Error, Result};
 use clap::parser::ArgMatches;
 
 use crate as mdsplode;
+use crate::json::{jq, print};
 use crate::md::converter;
 use crate::shell::state::State;
 use crate::shell::writer;
-use crate::sploder::util::{pretty_print, run_query};
 use crate::sploder::{file, parser};
 
 const PREFIX: &str = "  ";
@@ -32,9 +33,9 @@ pub fn query(state: State, matches: &ArgMatches) -> Result<State, String> {
         return Err("Parsed is empty, cannot run query. Has a file been read?".to_string());
     };
     let query = concat_args(matches, "query-string");
-    match run_query(state.clone().parsed, query) {
+    match jq::query(state.clone().parsed, query) {
         Ok(r) => match matches.get_one::<bool>("pretty-print") {
-            Some(true) => match pretty_print(r) {
+            Some(true) => match print::pretty(r) {
                 Ok(pp) => writer::msg(state.clone(), pp.as_str()),
                 Err(e) => Err(e.to_string()),
             },
@@ -92,6 +93,10 @@ pub fn read(mut state: State, matches: &ArgMatches) -> Result<State, String> {
 
 pub fn show(state: State, matches: &ArgMatches) -> Result<State, String> {
     match matches.subcommand() {
+        Some(("frontmatter", _)) => match frontmatter(state.clone().parsed) {
+            Ok(r) => writer::msg(state.clone(), r.as_str()),
+            Err(e) => Err(e.to_string()),
+        },
         Some(("in-file", _)) => writer::msg(state.clone(), format_string(state.in_file).as_str()),
         Some(("parsed", _)) => writer::msg(state.clone(), format_string(state.parsed).as_str()),
         Some(("source", _)) => writer::msg(state.clone(), format_string(state.source).as_str()),
@@ -132,4 +137,13 @@ fn concat_args(matches: &ArgMatches, id: &str) -> String {
 
 fn match_filename(matches: &ArgMatches) -> String {
     matches.get_one::<String>("filename").unwrap().to_string()
+}
+
+fn frontmatter(parsed: String) -> Result<String, Error> {
+    let q = ".children.nodes[] | select(.name == \"toml\") | .json";
+    let j_string = jq::query(parsed, q.to_string())?;
+    match serde_json::from_str(j_string.as_str()) {
+        Ok(r) => print::pretty(r),
+        Err(e) => Err(anyhow!(e.to_string())),
+    }
 }

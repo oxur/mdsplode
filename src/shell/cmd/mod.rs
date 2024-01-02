@@ -119,6 +119,12 @@ fn cmd() -> Command {
                 .about("Show various aspects of the mdsplode state (alias: sh)")
                 .help_template(USAGE_TEMPLATE)
                 .subcommand(
+                    Command::new("frontmatter")
+                        .alias("fm")
+                        .about("Show the parsed front matter data")
+                        .help_template(USAGE_TEMPLATE),
+                )
+                .subcommand(
                     Command::new("in-file")
                         .about("Show the input filename")
                         .help_template(USAGE_TEMPLATE),
