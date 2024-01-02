@@ -44,12 +44,9 @@ pub fn quit(mut state: State, _matches: &ArgMatches) -> Result<State, String> {
 
 pub fn read(mut state: State, matches: &ArgMatches) -> Result<State, String> {
     match matches.subcommand() {
-        Some((read_type, type_matches)) => {
-            log::debug!("Got subcommand: {:}", read_type);
-            let filename = type_matches
-                .get_one::<String>("filename")
-                .unwrap()
-                .to_string();
+        Some(("md", md_matches)) => {
+            log::debug!("Reading Markdown file ...");
+            let filename = match_filename(md_matches);
             state.in_file = filename.clone();
             match file::read_to_string(filename.clone()) {
                 Ok(s) => {
@@ -64,6 +61,24 @@ pub fn read(mut state: State, matches: &ArgMatches) -> Result<State, String> {
                 format_string(format!("Loaded \"{}\"", filename)).as_str(),
             )
         }
+        Some(("json", json_matches)) => {
+            log::debug!("Reading JSON file ...");
+            let filename = match_filename(json_matches);
+            state.in_file = filename.clone();
+            match file::read_to_string(filename.clone()) {
+                Ok(s) => {
+                    state.source = s.clone();
+                    state.parsed = s;
+                    Ok(())
+                }
+                Err(e) => Err(e.to_string()),
+            }?;
+            writer::msg(
+                state,
+                format_string(format!("Loaded \"{}\"", filename)).as_str(),
+            )
+        }
+        Some((name, _)) => unimplemented!("{name}"),
         None => writer::msg(state, format_str("No read subcommand matched").as_str()),
     }
 }
@@ -95,4 +110,8 @@ fn format_list(mut list: Vec<String>) -> String {
     let mut res: Vec<String> = vec![PREFIX.to_string()];
     res.append(&mut list);
     format!("\n{}{}\n", PREFIX, res.join(PREFIX).trim())
+}
+
+fn match_filename(matches: &ArgMatches) -> String {
+    matches.get_one::<String>("filename").unwrap().to_string()
 }
