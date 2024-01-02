@@ -1,7 +1,7 @@
 pub mod handler;
 
 use anyhow::Result;
-use clap::{value_parser, Arg, Command};
+use clap::{value_parser, Arg, ArgAction, Command};
 
 use super::state::State;
 
@@ -77,6 +77,12 @@ fn cmd() -> Command {
                 .alias("jq")
                 .about("Perform a jq-style query on the most recently read data (aliases: q, jq)")
                 .help_template(USAGE_TEMPLATE)
+                .arg(
+                    Arg::new("pretty-print")
+                        .long("pretty")
+                    .help(
+                        "Pretty-print the JSON result; only usable on queries that produce valid JSON",)
+                    .action(ArgAction::SetTrue))
                 .arg(
                     Arg::new("query-string")
                         .num_args(0..)
