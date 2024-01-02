@@ -11,6 +11,7 @@ use crate::cli::opts::Opts;
 use state::State;
 
 pub const DEFAULT_PROMPT: &str = "sploder> ";
+pub const DEFAULT_HISTORY_SIZE: usize = 1000;
 
 pub fn run(opts: Opts) -> Result<(), Error> {
     log::debug!("Starting shell ...");
@@ -27,7 +28,8 @@ fn shell(mut state: State) -> Result<State, String> {
             continue;
         }
         let line = reader::line(state.clone())?;
-        state.history.push(line.clone());
+        state.history.push_front(line.clone());
+        state.history.truncate(state.history_size);
         let line = line.trim();
         if line.is_empty() {
             continue;

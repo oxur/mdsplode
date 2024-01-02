@@ -1,8 +1,11 @@
+use std::collections::VecDeque;
+
 use crate::cli::opts::Opts;
 
 #[derive(Clone, Debug, Default)]
 pub struct State {
-    pub history: Vec<String>,
+    pub history: VecDeque<String>,
+    pub history_size: usize,
     pub in_file: String,
     pub out_file: String,
     pub parsed: String,
@@ -16,7 +19,9 @@ pub struct State {
 impl State {
     pub fn new(opts: Opts) -> State {
         State {
-            prompt: opts.prompt.unwrap(),
+            history: VecDeque::new(),
+            history_size: opts.history_size,
+            prompt: opts.prompt,
             show_banner: true,
             ..State::default()
         }

@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::{anyhow, Error, Result};
 use clap::{Parser, Subcommand};
 
-use crate::shell::DEFAULT_PROMPT;
+use crate::shell::{DEFAULT_HISTORY_SIZE, DEFAULT_PROMPT};
 
 use super::STDOUT;
 
@@ -11,6 +11,8 @@ use super::STDOUT;
 #[command(author, version, about, long_about = None)]
 #[command(propagate_version = true)]
 pub struct Opts {
+    #[arg(long, default_value_t = DEFAULT_HISTORY_SIZE, help = "Number of commands to keep in the shell history")]
+    pub history_size: usize,
     #[arg(short, long, help = "Input file or directory")]
     pub input: Option<String>,
     #[arg(
@@ -31,7 +33,7 @@ pub struct Opts {
     #[arg(long, action, help = "If provided, pretty-print output JSON")]
     pub pretty: bool,
     #[arg(long, default_value = DEFAULT_PROMPT, help = "Override the default shell prompt")]
-    pub prompt: Option<String>,
+    pub prompt: String,
     #[arg(short, long, help = "Optionally filter output with a jq query string")]
     pub query: Option<String>,
     #[arg(
