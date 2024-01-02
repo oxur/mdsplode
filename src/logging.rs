@@ -3,7 +3,7 @@ use anyhow::{anyhow, Error, Result};
 pub fn setup(log_level: String) -> Result<(), Error> {
     let cfg = twyg::LoggerOpts {
         coloured: true,
-        file: None,
+        file: Some("stderr".to_string()),
         level: log_level,
         report_caller: true,
     };

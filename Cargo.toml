@@ -23,7 +23,7 @@ serde = "1.0.193"
 serde_json = { version = "1.0.108", features = ["raw_value"] }
 shlex = "1.2.0"
 toml = "0.8.8"
-twyg = { version = "0.2" }
+twyg = { version = "0.3" }
 versions = "6.0.0"
 walkdir = "2.4"
 
