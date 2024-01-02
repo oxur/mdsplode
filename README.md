@@ -33,7 +33,7 @@ Or, from a clone of this repo:
 ```shell
 cd mdsplode
 make build
-./bin/mdsplode
+./bin/mdsplode shell
 ```
 
 [![][shell-screenshot-large]][shell-screenshot-large]
