@@ -19,12 +19,21 @@ The project is written in Rust and depends upon that toolchain as well as the us
 
 ## Shell
 
-The primary use case for mdsplode is to be managed my another long-running process that writes to mdsplode's `stdin` and reads from its `stdout`.
+The primary use case for mdsplode is to be managed my another long-running process that writes to mdsplode's `stdin` and reads from its `stdout`. This is accomplished via an interactive shell.
 
 The shell is started with that as the command on the CLI:
 
 ```shell
+cargo install mdsplode
 mdsplode shell
+```
+
+Or, from a clone of this repo:
+
+```shell
+cd mdsplode
+make build
+./bin/mdsplode
 ```
 
 [![][shell-screenshot-large]][shell-screenshot-large]
