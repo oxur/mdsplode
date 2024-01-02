@@ -21,7 +21,10 @@ pub fn echo(state: State, matches: &ArgMatches) -> Result<State, String> {
 }
 
 pub fn history(state: State, _matches: &ArgMatches) -> Result<State, String> {
-    writer::msg(state.clone(), format_list(state.history.into()).as_str())
+    let mut hist = state.history.clone();
+    let rev_hist = hist.make_contiguous();
+    rev_hist.reverse();
+    writer::msg(state.clone(), format_list(rev_hist.into()).as_str())
 }
 
 pub fn ping(state: State, _matches: &ArgMatches) -> Result<State, String> {
