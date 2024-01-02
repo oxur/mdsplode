@@ -29,10 +29,6 @@ pub fn parse_node(node: &Node) -> CompoundNode {
     c_node
 }
 
-pub fn parse_file(file: &str) -> CompoundNode {
-    parse_node(&md::converter::file_to_mdast(file))
-}
-
 pub fn to_children(node: &Node) -> Vec<CompoundNode> {
     match node.children() {
         None => vec![],

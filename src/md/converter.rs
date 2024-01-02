@@ -1,5 +1,3 @@
-use std::fs;
-
 use markdown::mdast::Node;
 
 use super::opts;
@@ -15,7 +13,6 @@ pub fn toml_to_json(node: Node) -> String {
     serde_json::to_string(&wrapper).unwrap()
 }
 
-pub fn file_to_mdast(file: &str) -> Node {
-    let md = fs::read_to_string(file).unwrap();
+pub fn string_to_mdast(md: String) -> Node {
     markdown::to_mdast(&md, &opts::parse_options()).unwrap()
 }
