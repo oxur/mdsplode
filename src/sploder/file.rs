@@ -5,11 +5,11 @@ use anyhow::{anyhow, Error, Result};
 use markdown::mdast::Node;
 
 use crate::cli::opts::Opts;
+use crate::json::{jq, print};
 use crate::md::converter;
 
 use super::parser;
 use super::types::CompoundNode;
-use super::util::{pretty_print, run_query};
 
 pub fn process(in_file: String, out_file: String, cli: Opts) -> Result<(), Error> {
     log::info!("Processing file: {}", in_file);
@@ -24,13 +24,13 @@ pub fn process(in_file: String, out_file: String, cli: Opts) -> Result<(), Error
     }
     // --query
     if let Some(ref query) = cli.query {
-        if let Ok(result) = run_query(json.clone(), query.to_string()) {
+        if let Ok(result) = jq::query(json.clone(), query.to_string()) {
             json = result;
         };
     };
     // --pretty
     if cli.pretty {
-        json = pretty_print(json.clone())?
+        json = print::pretty(json.clone())?
     }
     // --output
     if cli.is_stdout() {

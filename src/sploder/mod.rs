@@ -3,4 +3,3 @@ pub mod file;
 pub mod parser;
 pub mod renderer;
 pub mod types;
-pub mod util;

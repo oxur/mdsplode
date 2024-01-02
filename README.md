@@ -88,6 +88,22 @@ sploder> query --pretty '.children.nodes[] | select(.source == "Sub Heading 1")'
   "name": "heading",
   "source": "Sub Heading 1"
 }
+
+sploder> read md "tests/data/learn.md"
+
+  Loaded "tests/data/learn.md"
+
+sploder> show fm
+{
+  "frontmatter": {
+    "extra": {
+      "long_description": "Learning LFE must be taken in three tracks: learning the syntax particular to a Lisp on the Erlang VM, with all its support for pattern matching, Erlang-style arities, etc.; learning the ins-and-outs of BEAM languages and OTP; and finally, more deeply exploring the Lisp heritage of LFE. This multi-pronged approach is the path to success.",
+      "long_title": "Resources for Learning LFE"
+    },
+    "in_search_index": true,
+    "title": "Learn"
+  }
+}
 sploder> quit
 
   Quitting ...
