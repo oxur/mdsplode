@@ -65,7 +65,7 @@ Welcome to
         {WHITE},--{END}{RED}.{END}{YELLOW}!{END}{RED},{END}
      {BLUE}__{END}{WHITE}/{END}   {YELLOW}-{END}{YELLOW_BOLD}*{END}{YELLOW}-{END}   {GREEN}_____ ____  _       ___   ___      ___{END}
    {BLUE},d08b.{END}  {RED}'{END}{YELLOW}|{END}{RED}`{END}  {GREEN}/ ___/|    \| T     /   \ |   \    /  _]{END}
-   {BLUE}0088MM{END}      {GREEN}(   \_ |  o  ) |    Y     Y|    \  /  [_{END}
+   {BLUE}0088MM{END}      {GREEN}(   \_ |  P  ) |    Y     Y|    \  /  [_{END}
    {BLUE}`9MMP'{END}    __ {GREEN}\__  T|   _/| l___ |  O  ||  D  YY    _]
 {GREEN}.--------.--|  |/  \ ||  |  |     T|     ||     ||   [_
 |        |  _  |\    ||  |  |     |l     !|     ||     T
