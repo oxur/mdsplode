@@ -48,6 +48,10 @@ sploder> show parsed
 
   ... # JSON data
 
+sploder> read json "tests/data/parsed.json"
+
+  Loaded "tests/data/parsed.json"
+
 sploder> quit
 
   Quitting ...
