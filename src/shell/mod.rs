@@ -54,8 +54,8 @@ fn banner() -> &'static str {
     const GREEN: &str = "\x1B[32m";
     const BLUE: &str = "\x1B[34m";
     const WHITE: &str = "\x1B[1;37m";
-
     const END: &str = "\x1B[0m";
+    const VERSION: &str = crate::VERSION;
     formatcp!(
         r#"
 Welcome to
@@ -69,7 +69,9 @@ Welcome to
 |        |  _  |\    ||  |  |     |l     !|     ||     T
 |__|__|__|_____| \___jl__j  l_____j \___/ l_____jl_____j{END}
 
+v{VERSION}
+
 To see a list of available commands, type "help" at the prompt.
-"#
+"#,
     )
 }

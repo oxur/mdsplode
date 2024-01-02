@@ -18,6 +18,7 @@ pub fn dispatch(state: State, line: &str) -> Result<State, String> {
         Some(("query", matches)) => handler::query(state.clone(), matches),
         Some(("quit", matches)) => handler::quit(state.clone(), matches),
         Some(("read", matches)) => handler::read(state.clone(), matches),
+        Some(("show", matches)) => handler::show(state.clone(), matches),
         Some(("version", matches)) => handler::version(state.clone(), matches),
         Some((name, _matches)) => unimplemented!("{name}"),
         None => unreachable!("subcommand required"),
@@ -97,13 +98,34 @@ fn cmd() -> Command {
                     Command::new("md")
                         .about("Set the data source to be read as Markdown")
                         .help_template(USAGE_TEMPLATE)
-                        .arg(Arg::new("filename")),
+                        .arg(Arg::new("filename").required(true)),
                 )
                 .subcommand(
                     Command::new("json")
                         .about("Set the data source to be read as JSON")
                         .help_template(USAGE_TEMPLATE)
-                        .arg(Arg::new("filename")),
+                        .arg(Arg::new("filename").required(true)),
+                ),
+        )
+        .subcommand(
+            Command::new("show")
+                .alias("sh")
+                .about("Show various aspects of the mdsplode state (alias: sh)")
+                .help_template(USAGE_TEMPLATE)
+                .subcommand(
+                    Command::new("in-file")
+                        .about("Show the input filename")
+                        .help_template(USAGE_TEMPLATE),
+                )
+                .subcommand(
+                    Command::new("parsed")
+                        .about("Show the parsed Markdown data (JSON)")
+                        .help_template(USAGE_TEMPLATE),
+                )
+                .subcommand(
+                    Command::new("source")
+                        .about("Show the Markdown source")
+                        .help_template(USAGE_TEMPLATE),
                 ),
         )
         .subcommand(
