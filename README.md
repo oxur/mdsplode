@@ -11,7 +11,7 @@
 
 ## About
 
-This tool came about as a result of a pressing need in some LFE projects that needed finer-grained processing of Markdown files for publishing projects.
+This tool came about as a result of a pressing need in some LFE projects that required finer-grained processing of Markdown files for publishing projects.
 
 ## Dependencies
 
@@ -28,6 +28,31 @@ mdsplode shell
 ```
 
 [![][shell-screenshot-large]][shell-screenshot-large]
+
+A quick session:
+
+```shell
+sploder> read md "tests/data/learn.md"
+
+  Loaded "tests/data/learn.md"
+
+sploder> show in-file
+
+  tests/data/learn.md
+
+sploder> show source
+
+  ... # Markdown data
+
+sploder> show parsed
+
+  ... # JSON data
+
+sploder> quit
+
+  Quitting ...
+
+```
 
 ## CLI Usage
 
