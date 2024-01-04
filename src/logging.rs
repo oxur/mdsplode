@@ -1,14 +1,22 @@
 use anyhow::{anyhow, Error, Result};
 
-pub fn setup(log_level: String) -> Result<(), Error> {
-    let cfg = twyg::LoggerOpts {
-        coloured: true,
+use crate::cli::opts::Opts;
+
+pub fn setup(opts: Opts) -> Result<(), Error> {
+    let cfg = twyg::Opts {
+        coloured: !opts.no_colour,
         file: Some("stderr".to_string()),
-        level: log_level,
+        level: Some(opts.log_level),
         report_caller: true,
+
+        ..Default::default()
     };
-    match twyg::setup_logger(&cfg) {
+    owo_colors::set_override(cfg.coloured);
+
+    let result = match twyg::setup(cfg.clone()) {
         Err(e) => Err(anyhow!("{:}", e)),
         Ok(_) => Ok(()),
-    }
+    };
+    log::debug!("Logging configured with {:?}", cfg);
+    result
 }
