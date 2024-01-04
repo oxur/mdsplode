@@ -101,7 +101,7 @@ impl Opts {
     }
 
     pub fn post_process(&mut self) {
-        if self.etx_line_ending {
+        if self.headless {
             self.etx_line_ending = true;
             self.no_banner = true;
             self.no_colour = true;

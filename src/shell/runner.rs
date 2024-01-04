@@ -15,9 +15,9 @@ fn shell(mut state: State) -> Result<State, String> {
     loop {
         log::debug!("Got state: {:?}", state);
         if state.show_banner {
-            state.show_banner = false;
             let mut colours = Colours::new();
             if !state.without_colour {
+                // TODO: now that we're not formatting constants, let's use the owo-color library
                 colours = Colours {
                     red: "\x1B[1;31m",
                     yellow_bold: "\x1B[1;33m",
@@ -27,7 +27,8 @@ fn shell(mut state: State) -> Result<State, String> {
                     white: "\x1B[1;37m",
                     end: "\x1B[0m",
                 };
-            }
+            };
+            state.show_banner = false;
             writer::msg(state.clone(), banner(colours).as_str())?;
             continue;
         }
