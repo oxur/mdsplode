@@ -10,8 +10,9 @@ use mdsplode::{logging, shell};
 
 fn main() -> Result<(), Error> {
     reset_sigpipe();
-    let cli = Opts::parse();
-    logging::setup(cli.log_level.clone())?;
+    let mut cli = Opts::parse();
+    cli.post_process();
+    logging::setup(cli.clone())?;
     match &cli.command {
         Some(Commands::Shell) => shell::run(cli),
         None => {
