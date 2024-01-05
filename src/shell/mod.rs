@@ -1,5 +1,4 @@
 pub mod cmd;
-pub mod reader;
 pub mod runner;
 pub mod state;
 pub mod writer;
