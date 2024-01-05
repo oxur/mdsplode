@@ -56,15 +56,7 @@ pub struct Opts {
     #[arg(
         long,
         action,
-        help = "Set line delimiter to use ETX (0x03) 'end of text'",
-        help_heading = "Shell Options",
-        global = true
-    )]
-    pub etx_line_ending: bool,
-    #[arg(
-        long,
-        action,
-        help = "Set if the shell will be read programmatically and not in an interactive session; implies --etx-line-ending, --no-banner, and --no-colour",
+        help = "Set if the shell will be read programmatically and not in an interactive session; implies --no-banner and --no-colour",
         help_heading = "Shell Options",
         global = true
     )]
@@ -102,7 +94,6 @@ impl Opts {
 
     pub fn post_process(&mut self) {
         if self.headless {
-            self.etx_line_ending = true;
             self.no_banner = true;
             self.no_colour = true;
         }
