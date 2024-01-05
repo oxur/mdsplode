@@ -96,6 +96,7 @@ impl Opts {
         if self.headless {
             self.no_banner = true;
             self.no_colour = true;
+            self.prompt = "".to_string();
         }
     }
 
