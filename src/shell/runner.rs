@@ -74,16 +74,17 @@ fn shell(mut state: State) -> Result<State, String> {
                 }
             }
             Err(ReadlineError::Interrupted) => {
-                writer::msg(state.clone(), "Got ^c ...")?;
-                state.quit = true;
+                writer::msg(state.clone(), "^C")?;
+                log::info!("^C");
+                cmd::dispatch(state.clone(), "quit")?;
                 break;
             }
             Err(ReadlineError::Eof) => {
-                log::info!("Got ^d ...");
+                log::info!("^D");
                 break;
             }
-            Err(err) => {
-                log::error!("Error: {:?}", err);
+            Err(e) => {
+                log::error!("Error: {:?}", e);
                 break;
             }
         }
