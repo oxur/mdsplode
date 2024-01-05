@@ -6,7 +6,7 @@ use crate::cli::opts::Opts;
 pub fn setup(opts: Opts) -> Result<(), Error> {
     let cfg = twyg::Opts {
         coloured: !opts.no_colour,
-        file: out::stderr(),
+        file: out::stdout(),
         level: Some(opts.log_level),
         report_caller: true,
 
