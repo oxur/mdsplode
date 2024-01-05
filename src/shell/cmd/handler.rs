@@ -121,9 +121,9 @@ fn format_string(item: String) -> String {
     format!("\n{}{}\n", PREFIX, item.trim())
 }
 
-fn format_list(mut list: Vec<String>) -> String {
+fn format_list(list: Vec<String>) -> String {
     let mut res: Vec<String> = vec![PREFIX.to_string()];
-    res.append(&mut list);
+    res.append(&mut list.iter().map(|x| format!("{}\n", x.trim())).collect());
     format!("\n{}{}\n", PREFIX, res.join(PREFIX).trim())
 }
 
