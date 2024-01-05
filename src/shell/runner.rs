@@ -1,17 +1,33 @@
+use std::fs;
+use std::path::Path;
+
 use anyhow::{Error, Result};
+use rustyline::{error::ReadlineError, DefaultEditor};
 
 use crate::cli::opts::Opts;
 
 use super::state::State;
-use super::{cmd, reader, writer};
+use super::{cmd, writer};
 
 pub fn run(opts: Opts) -> Result<(), Error> {
-    log::debug!("Starting shell ...");
+    log::info!("Starting shell ...");
     _ = shell(State::new(opts));
     Ok(())
 }
 
 fn shell(mut state: State) -> Result<State, String> {
+    let prompt = state.prompt.clone();
+    let mut history_file = dirs::data_dir().unwrap();
+    history_file.push(Path::new("mdsplode"));
+    match fs::create_dir_all(history_file.as_path()) {
+        Ok(_) => (),
+        Err(e) => log::error!("Couldn't create history file parent dirs: {:?}", e),
+    }
+    history_file.push(Path::new("cmd.history"));
+    let mut rl = DefaultEditor::new().unwrap();
+    if rl.load_history(&history_file).is_err() {
+        log::debug!("No previous history.");
+    }
     loop {
         log::debug!("Got state: {:?}", state);
         if state.show_banner {
@@ -32,24 +48,49 @@ fn shell(mut state: State) -> Result<State, String> {
             writer::msg(state.clone(), banner(colours).as_str())?;
             continue;
         }
-        let line = reader::line(state.clone())?;
-        state.history.push_front(line.clone());
-        state.history.truncate(state.history_size);
-        let line = line.trim();
-        if line.is_empty() {
-            continue;
-        }
-        match cmd::dispatch(state.clone(), line) {
-            Ok(new_state) => {
-                state = new_state;
-                if state.quit {
-                    break;
+        writer::flush()?;
+        let readline = rl.readline(prompt.as_str());
+        match readline {
+            Ok(line) => {
+                if line.is_empty() {
+                    continue;
+                }
+                match rl.add_history_entry(line.as_str()) {
+                    Ok(_) => (),
+                    Err(e) => log::error!("Could not update history file: {:?}", e),
+                }
+                state.history.push_front(line.clone());
+                state.history.truncate(state.history_size);
+                match cmd::dispatch(state.clone(), line.as_str()) {
+                    Ok(new_state) => {
+                        state = new_state;
+                        if state.quit {
+                            break;
+                        }
+                    }
+                    Err(err) => {
+                        writer::msg(state.clone(), err.as_str())?;
+                    }
                 }
             }
+            Err(ReadlineError::Interrupted) => {
+                writer::msg(state.clone(), "Got ^c ...")?;
+                state.quit = true;
+                break;
+            }
+            Err(ReadlineError::Eof) => {
+                log::info!("Got ^d ...");
+                break;
+            }
             Err(err) => {
-                writer::msg(state.clone(), err.as_str())?;
+                log::error!("Error: {:?}", err);
+                break;
             }
         }
+    }
+    match rl.save_history(&history_file) {
+        Ok(_) => (),
+        Err(e) => log::warn!("Could not save history file: {:?}", e),
     }
     Ok(state)
 }

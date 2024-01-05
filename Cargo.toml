@@ -14,11 +14,13 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.77"
 clap = { version = "4.4.11", features = ["derive"] }
+dirs = "5"
 jq-rs = "0.4.1"
 libc = "0.2.151"
 log = "0.4"
 markdown = { version = "1.0.0-alpha.16", features = ["serde"] }
 owo-colors = { version = "4.0.0", features = ["supports-colors"] }
+rustyline = { version = "13.0.0", features = ["with-file-history"] }
 serde = "1.0.193"
 serde_json = { version = "1.0.108", features = ["raw_value"] }
 shlex = "1.2.0"
