@@ -21,6 +21,12 @@ echo help > $FIFO
 sleep 1
 echo help show > $FIFO
 sleep 1
+echo read md $MD_FILE > $FIFO
+sleep 1
+echo $'query \'.children.nodes[] | select((.depth == 3) and .source == "Getting Started")\'' > $FIFO
+sleep 1
+echo show frontmatter > $FIFO
+sleep 1
 echo history > $FIFO
 sleep 1
 echo quit > $FIFO
