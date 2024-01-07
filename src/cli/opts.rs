@@ -1,6 +1,7 @@
-use std::path::Path;
+use std::{fmt, path::Path, str::FromStr};
 
 use anyhow::{anyhow, Error, Result};
+use clap::builder::{PossibleValuesParser, TypedValueParser};
 use clap::{ArgGroup, Parser, Subcommand};
 
 use crate::cli;
@@ -72,6 +73,16 @@ pub struct Opts {
     pub log_device: Option<String>,
     #[arg(
         long,
+        default_value = "text",
+        help = "The format in which to serialise output",
+        help_heading = "Shell Options",
+        value_parser = PossibleValuesParser::new(["text", "json"])
+        .map(|s| s.parse::<Format>().unwrap()),
+        global = true
+    )]
+    pub format: Format,
+    #[arg(
+        long,
         action,
         help = "Set if the shell will be read programmatically and not in an interactive session; implies --no-banner and --no-colour",
         help_heading = "Shell Options",
@@ -119,6 +130,7 @@ impl Opts {
         if self.headless {
             self.no_banner = true;
             self.no_colour = true;
+            self.format = Format::JSON;
             self.prompt = "".to_string();
         }
     }
@@ -149,4 +161,32 @@ impl Opts {
 #[derive(Subcommand, Clone, Debug)]
 pub enum Commands {
     Shell,
+}
+
+#[derive(Clone, Debug, Default)]
+pub enum Format {
+    #[default]
+    Text,
+    JSON,
+}
+
+impl fmt::Display for Format {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Format::Text => write!(f, "text"),
+            Format::JSON => write!(f, "json"),
+        }
+    }
+}
+
+impl FromStr for Format {
+    type Err = ();
+
+    fn from_str(input: &str) -> Result<Format, Self::Err> {
+        match input.to_lowercase().as_str() {
+            "text" => Ok(Format::Text),
+            "json" => Ok(Format::JSON),
+            _ => Err(()),
+        }
+    }
 }

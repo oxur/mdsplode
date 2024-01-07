@@ -1,13 +1,38 @@
 use std::io;
 
-use crate::cli;
+use serde::{Deserialize, Serialize};
+
+use crate::cli::{self, opts::Format};
 
 use super::state::State;
 
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+struct Output {
+    command: String,
+    result: String,
+    errors: Vec<String>,
+}
+
 pub fn msg(state: State, msg: &str) -> Result<State, String> {
-    // let d = state.clone().device.ok_or("no device".to_string())?;
+    let out = Output {
+        command: match state.history.front() {
+            None => "".to_string(),
+            Some(s) => s.trim().to_string(),
+        },
+        result: msg.trim().to_string(),
+        ..Default::default()
+    };
     log::debug!("Writing to device '{:}' ...", state.device.as_str());
-    raw_msg(state.device.as_str(), msg)?;
+    match state.format {
+        Format::Text => raw_msg(state.device.as_str(), msg),
+        Format::JSON => {
+            let json = match serde_json::to_string(&out) {
+                Ok(s) => s,
+                Err(e) => e.to_string(),
+            };
+            raw_msg(state.device.as_str(), json.as_str())
+        }
+    }?;
     flush_stderr()?;
     flush_stdout()?;
     Ok(state)

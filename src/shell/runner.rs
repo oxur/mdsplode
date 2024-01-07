@@ -65,6 +65,7 @@ fn shell(mut state: State) -> Result<State, String> {
                 }
                 state.history.push_front(line.clone());
                 state.history.truncate(state.history_size);
+                log::debug!("Front of history VecDeque: {:?}", state.history.front());
                 match cmd::dispatch(state.clone(), line.as_str()) {
                     Ok(new_state) => {
                         state = new_state;
