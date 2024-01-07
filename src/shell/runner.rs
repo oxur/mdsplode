@@ -29,7 +29,7 @@ fn shell(mut state: State) -> Result<State, String> {
         log::debug!("No previous history.");
     }
     loop {
-        log::debug!("Got state: {:?}", state);
+        log::trace!("Got state: {:?}", state);
         if state.show_banner {
             let mut colours = Colours::new();
             if !state.without_colour {
@@ -45,10 +45,14 @@ fn shell(mut state: State) -> Result<State, String> {
                 };
             };
             state.show_banner = false;
-            writer::msg(state.clone(), banner(colours).as_str())?;
+            match writer::msg(state.clone(), banner(colours).as_str()) {
+                Ok(_) => log::info!("Wrote banner."),
+                Err(e) => log::error!("Failed to write banner: {}", e),
+            }
             continue;
         }
-        writer::flush()?;
+        // writer::flush(&state)?;
+        log::debug!("Reading line ...");
         let readline = rl.readline(prompt.as_str());
         match readline {
             Ok(line) => {

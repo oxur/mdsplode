@@ -3,6 +3,7 @@ use std::path::Path;
 use anyhow::{anyhow, Error, Result};
 use clap::{ArgGroup, Parser, Subcommand};
 
+use crate::cli;
 use crate::shell::{DEFAULT_HISTORY_SIZE, DEFAULT_PROMPT};
 
 use super::STDOUT;
@@ -55,6 +56,22 @@ pub struct Opts {
     // Shell options
     #[arg(
         long,
+        default_value = "stdout",
+        help = "The output device to use when writing results",
+        help_heading = "Shell Options",
+        global = true
+    )]
+    pub device: Option<String>,
+    #[arg(
+        long,
+        default_value = "stderr",
+        help = "The output device to use for writing logging output",
+        help_heading = "Shell Options",
+        global = true
+    )]
+    pub log_device: Option<String>,
+    #[arg(
+        long,
         action,
         help = "Set if the shell will be read programmatically and not in an interactive session; implies --no-banner and --no-colour",
         help_heading = "Shell Options",
@@ -93,6 +110,12 @@ impl Opts {
     }
 
     pub fn post_process(&mut self) {
+        if self.device.is_none() {
+            self.device = cli::stdout()
+        }
+        if self.log_device.is_none() {
+            self.log_device = cli::stderr()
+        }
         if self.headless {
             self.no_banner = true;
             self.no_colour = true;

@@ -1,9 +1,10 @@
 use std::collections::VecDeque;
 
-use crate::cli::opts::Opts;
+use crate::cli::{self, opts::Opts};
 
 #[derive(Clone, Debug, Default)]
 pub struct State {
+    pub device: String,
     pub history: VecDeque<String>,
     pub history_size: usize,
     pub in_file: String,
@@ -12,14 +13,15 @@ pub struct State {
     pub prompt: String,
     pub quit: bool,
     pub result: String,
-    pub show_banner: bool,
     pub source: String,
+    pub show_banner: bool,
     pub without_colour: bool,
 }
 
 impl State {
     pub fn new(opts: Opts) -> State {
         State {
+            device: opts.device.unwrap(),
             history: VecDeque::new(),
             history_size: opts.history_size,
             prompt: opts.prompt,
@@ -27,5 +29,9 @@ impl State {
             without_colour: opts.no_colour,
             ..State::default()
         }
+    }
+
+    pub fn is_stderr(&self) -> bool {
+        self.device == cli::stderr().unwrap()
     }
 }
