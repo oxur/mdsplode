@@ -96,7 +96,7 @@ pub fn read(mut state: State, matches: &ArgMatches) -> Result<State, String> {
 
 pub fn show(state: State, matches: &ArgMatches) -> Result<State, String> {
     match matches.subcommand() {
-        Some(("frontmatter", _)) => match frontmatter(state.clone().parsed) {
+        Some(("frontmatter", _)) => match frontmatter(state.clone(), state.clone().parsed) {
             Ok(r) => writer::msg(state.clone(), r.as_str()),
             Err(e) => Err(e.to_string()),
         },
@@ -142,11 +142,17 @@ fn match_filename(matches: &ArgMatches) -> String {
     matches.get_one::<String>("filename").unwrap().to_string()
 }
 
-fn frontmatter(parsed: String) -> Result<String, Error> {
+fn frontmatter(state: State, parsed: String) -> Result<String, Error> {
     let q = ".children.nodes[] | select(.name == \"toml\") | .json";
     let j_string = jq::query(parsed, q.to_string())?;
     match serde_json::from_str(j_string.as_str()) {
-        Ok(r) => print::pretty(r),
+        Ok(r) => {
+            if state.pretty {
+                print::pretty(r)
+            } else {
+                Ok(r)
+            }
+        }
         Err(e) => Err(anyhow!(e.to_string())),
     }
 }

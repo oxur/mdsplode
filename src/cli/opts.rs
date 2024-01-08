@@ -84,7 +84,7 @@ pub struct Opts {
     #[arg(
         long,
         action,
-        help = "Set if the shell will be read programmatically and not in an interactive session; implies --no-banner and --no-colour",
+        help = "Set if the shell will be read programmatically and not in an interactive session; implies '--format json', '--no-banner', '--no-colour', and 'prompt \"\"' (pretty is also hard-coded to 'false')",
         help_heading = "Shell Options",
         global = true
     )]
@@ -128,9 +128,10 @@ impl Opts {
             self.log_device = cli::stderr()
         }
         if self.headless {
+            self.format = Format::JSON;
             self.no_banner = true;
             self.no_colour = true;
-            self.format = Format::JSON;
+            self.pretty = false;
             self.prompt = "".to_string();
         }
     }
